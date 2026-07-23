@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pushpendra Tripathi — DevOps Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0E1420;
+    --panel: #171F30;
+    --panel-2: #1D2740;
+    --border: #2B3550;
+    --text: #EEF2F8;
+    --text-dim: #9AA7BD;
+    --teal: #17C3B2;
+    --coral: #FF6B6B;
+    --gold: #FFC145;
+    --violet: #8B7CF6;
+    --shadow: 0 10px 30px rgba(0,0,0,0.25);
+  }
+  html[data-theme="light"]{
+    --bg: #F7F8FB;
+    --panel: #FFFFFF;
+    --panel-2: #F1F3F9;
+    --border: #E3E7F0;
+    --text: #171B27;
+    --text-dim: #616B80;
+    --shadow: 0 10px 26px rgba(30,40,70,0.08);
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    transition: background 0.35s ease, color 0.35s ease;
+    overflow-x: hidden;
+  }
+  .mono{ font-family:'IBM Plex Mono', monospace; }
+  h1,h2,h3{ font-family:'Poppins', sans-serif; margin:0; }
+  a{ color: var(--teal); text-decoration:none; }
+  a:hover{ text-decoration:underline; }
+  ::selection{ background: var(--gold); color:#171B27; }
+  a:focus-visible, button:focus-visible, .filter-btn:focus-visible{
+    outline: 2px solid var(--teal); outline-offset:3px;
+  }
+  img{ max-width:100%; }
+
+  .wrap{ max-width: 1080px; margin:0 auto; padding: 0 28px; }
+
+  /* ---------------- NAV ---------------- */
+  header.nav{
+    position: sticky; top:0; z-index: 100;
+    background: color-mix(in srgb, var(--bg) 86%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner{
+    max-width:1080px; margin:0 auto; padding: 16px 28px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .brand{
+    font-family:'Poppins', sans-serif; font-weight:700; font-size:18px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .brand .dot{
+    width:10px; height:10px; border-radius:50%;
+    background: linear-gradient(135deg, var(--teal), var(--violet));
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--teal) 18%, transparent);
+  }
+  nav.links{ display:flex; align-items:center; gap:8px; }
+  nav.links a{
+    font-family:'IBM Plex Mono', monospace; font-size:13px;
+    color: var(--text-dim);
+    padding: 8px 14px; border-radius: 20px;
+    position: relative;
+  }
+  nav.links a:hover{ color: var(--text); text-decoration:none; }
+  nav.links a.active{ color: var(--bg); background: linear-gradient(120deg, var(--teal), var(--violet)); }
+  html[data-theme="light"] nav.links a.active{ color:#fff; }
+
+  .icon-btn{
+    width: 38px; height:38px; border-radius:50%;
+    border: 1px solid var(--border); background: var(--panel);
+    color: var(--text); display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:16px; margin-left: 12px;
+  }
+  .icon-btn:hover{ border-color: var(--teal); }
+
+  .menu-toggle{ display:none; background:none; border:none; color:var(--text); font-size:22px; cursor:pointer; }
+
+  @media (max-width: 760px){
+    nav.links{
+      position:fixed; top:64px; left:0; right:0;
+      flex-direction:column; align-items:stretch;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px 18px;
+      gap:4px;
+      transform: translateY(-140%);
+      transition: transform 0.3s ease;
+      z-index: 90;
+    }
+    nav.links.open{ transform: translateY(0); }
+    nav.links a{ padding: 12px 10px; text-align:left; border-radius:8px; }
+    .menu-toggle{ display:block; }
+  }
+
+  /* ---------------- HERO ---------------- */
+  .hero{ padding: 84px 0 70px; position:relative; }
+  .badge{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono', monospace; font-size:12.5px;
+    color: var(--teal);
+    background: color-mix(in srgb, var(--teal) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--teal) 35%, transparent);
+    padding: 6px 14px; border-radius: 20px;
+    margin-bottom: 26px;
+  }
+  .badge .live-dot{
+    width:7px; height:7px; border-radius:50%; background: var(--teal);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse{ 0%,100%{ opacity:1; transform:scale(1);} 50%{opacity:0.4; transform:scale(1.4);} }
+
+  h1.hero-title{
+    font-size: clamp(38px, 6vw, 62px);
+    font-weight: 800; line-height:1.08; letter-spacing:-0.01em;
+    margin-bottom: 20px;
+  }
+  h1.hero-title .grad{
+    background: linear-gradient(100deg, var(--teal), var(--violet) 55%, var(--coral));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .hero-sub{
+    max-width: 640px; color: var(--text-dim); font-size: 17.5px; margin-bottom: 36px;
+  }
+  .hero-actions{ display:flex; flex-wrap:wrap; gap:14px; margin-bottom: 52px; }
+  .btn{
+    font-family:'IBM Plex Mono', monospace; font-size:14px; font-weight:500;
+    padding: 14px 26px; border-radius: 8px; cursor:pointer; border:1px solid transparent;
+    display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn-grad{
+    background: linear-gradient(120deg, var(--teal), var(--violet));
+    color:#0E1420; font-weight:600;
+  }
+  .btn-grad:hover{ filter:brightness(1.08); text-decoration:none; }
+  .btn-outline{ background: transparent; border:1px solid var(--border); color: var(--text); }
+  .btn-outline:hover{ border-color: var(--teal); color: var(--teal); text-decoration:none; }
+
+  .stat-grid{
+    display:grid; grid-template-columns: repeat(4,1fr); gap:16px;
+  }
+  @media (max-width:720px){ .stat-grid{ grid-template-columns: repeat(2,1fr); } }
+  .stat-card{
+    background: var(--panel); border:1px solid var(--border); border-radius: 12px;
+    padding: 20px 18px; box-shadow: var(--shadow);
+  }
+  .stat-card b{
+    display:block; font-family:'Poppins',sans-serif; font-size:32px; font-weight:800;
+  }
+  .stat-card:nth-child(1) b{ color: var(--teal); }
+  .stat-card:nth-child(2) b{ color: var(--coral); }
+  .stat-card:nth-child(3) b{ color: var(--gold); }
+  .stat-card:nth-child(4) b{ color: var(--violet); }
+  .stat-card span{ color: var(--text-dim); font-size:13px; }
+
+  /* ---------------- REVEAL ---------------- */
+  .reveal{ opacity:0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.in{ opacity:1; transform: translateY(0); }
+
+  /* ---------------- SECTION HEAD ---------------- */
+  section{ padding: 74px 0; }
+  .sec-head{ display:flex; align-items:center; gap:16px; margin-bottom:38px; }
+  .sec-tag{
+    font-family:'IBM Plex Mono', monospace; font-size:12.5px; letter-spacing:0.1em;
+    text-transform:uppercase; padding:5px 12px; border-radius:6px;
+    background: color-mix(in srgb, var(--violet) 14%, transparent);
+    color: var(--violet); border:1px solid color-mix(in srgb, var(--violet) 35%, transparent);
+  }
+  h2.sec-title{ font-size: clamp(24px,3vw,32px); font-weight:700; }
+  .sec-rule{ flex:1; height:1px; background: linear-gradient(to right, var(--border), transparent); }
+
+  /* ---------------- ABOUT ---------------- */
+  .about-grid{ display:grid; grid-template-columns: 1.3fr 1fr; gap: 32px; align-items:start; }
+  @media (max-width:780px){ .about-grid{ grid-template-columns:1fr; } }
+  .about-text{ color: var(--text-dim); font-size:16.5px; }
+  .about-text strong{ color: var(--text); }
+  .about-card{
+    background: var(--panel); border:1px solid var(--border); border-radius:14px;
+    padding:24px; box-shadow: var(--shadow);
+  }
+  .about-card h3{ font-size:15px; margin-bottom:14px; color: var(--teal); }
+  .mini-row{ display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px dashed var(--border); font-size:14px; }
+  .mini-row:last-child{ border-bottom:none; }
+  .mini-row span:first-child{ color: var(--text-dim); }
+  .mini-row span:last-child{ font-family:'IBM Plex Mono', monospace; }
+
+  /* ---------------- EXPERIENCE ---------------- */
+  .timeline{ position:relative; padding-left: 30px; }
+  .timeline::before{
+    content:""; position:absolute; left:5px; top:6px; bottom:6px; width:2px;
+    background: linear-gradient(to bottom, var(--teal), var(--violet), var(--coral));
+    border-radius:2px;
+  }
+  .job{ position:relative; margin-bottom:42px; }
+  .job:last-child{ margin-bottom:0; }
+  .job::before{
+    content:""; position:absolute; left:-30px; top:4px; width:12px; height:12px; border-radius:50%;
+    background: var(--bg); border:3px solid var(--teal);
+  }
+  .job:nth-child(2)::before{ border-color: var(--violet); }
+  .job-card{
+    background: var(--panel); border:1px solid var(--border); border-radius:12px;
+    padding:22px 24px; box-shadow: var(--shadow);
+  }
+  .job-row{ display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 16px; margin-bottom:2px; }
+  .job-title{ font-family:'Poppins', sans-serif; font-weight:700; font-size:18.5px; }
+  .job-date{ font-family:'IBM Plex Mono', monospace; font-size:12.5px; color: var(--gold); }
+  .job-co{ color: var(--text-dim); font-size:14px; margin-bottom:16px; }
+  .job ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:11px; }
+  .job li{ display:flex; gap:10px; font-size:15px; color: var(--text-dim); }
+  .job li .tag{
+    font-family:'IBM Plex Mono', monospace; font-size:10.5px; white-space:nowrap; margin-top:2px;
+    padding: 2px 7px; border-radius:5px; height:fit-content;
+  }
+  .tag-cicd{ color:var(--teal); background: color-mix(in srgb, var(--teal) 14%, transparent); border:1px solid color-mix(in srgb, var(--teal) 40%, transparent); }
+  .tag-iac{ color:var(--violet); background: color-mix(in srgb, var(--violet) 14%, transparent); border:1px solid color-mix(in srgb, var(--violet) 40%, transparent); }
+  .tag-k8s{ color:var(--coral); background: color-mix(in srgb, var(--coral) 14%, transparent); border:1px solid color-mix(in srgb, var(--coral) 40%, transparent); }
+  .tag-ops{ color:var(--gold); background: color-mix(in srgb, var(--gold) 16%, transparent); border:1px solid color-mix(in srgb, var(--gold) 45%, transparent); }
+
+  /* ---------------- SKILLS ---------------- */
+  .skills-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap:18px; }
+  .skill-card{
+    background: var(--panel); border:1px solid var(--border); border-radius:12px;
+    padding:20px; box-shadow: var(--shadow); border-top:3px solid var(--teal);
+  }
+  .skill-card:nth-child(4n+2){ border-top-color: var(--coral); }
+  .skill-card:nth-child(4n+3){ border-top-color: var(--gold); }
+  .skill-card:nth-child(4n+4){ border-top-color: var(--violet); }
+  .skill-card h3{ font-size:13.5px; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:12px; color: var(--text-dim); }
+  .chip-row{ display:flex; flex-wrap:wrap; gap:7px; }
+  .chip{
+    font-family:'IBM Plex Mono', monospace; font-size:12.5px;
+    background: var(--panel-2); border:1px solid var(--border); border-radius:6px;
+    padding: 4px 9px; color: var(--text);
+  }
+
+  /* ---------------- PROJECTS ---------------- */
+  .filter-row{ display:flex; gap:10px; margin-bottom: 26px; flex-wrap:wrap; }
+  .filter-btn{
+    font-family:'IBM Plex Mono', monospace; font-size:13px; padding:8px 16px; border-radius:20px;
+    border:1px solid var(--border); background: var(--panel); color: var(--text-dim); cursor:pointer;
+  }
+  .filter-btn.active{ background: linear-gradient(120deg, var(--teal), var(--violet)); color:#0E1420; border-color:transparent; font-weight:600; }
+  .projects-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:20px; }
+  @media (max-width:720px){ .projects-grid{ grid-template-columns:1fr; } }
+  .project-card{
+    background: var(--panel); border:1px solid var(--border); border-radius:14px;
+    padding:24px; box-shadow: var(--shadow); transition: transform 0.25s ease, border-color 0.25s ease;
+    position:relative; overflow:hidden;
+  }
+  .project-card:hover{ transform: translateY(-4px); border-color: var(--teal); }
+  .project-card::after{
+    content:""; position:absolute; top:0; right:0; width:90px; height:90px;
+    background: radial-gradient(circle at top right, color-mix(in srgb, var(--violet) 25%, transparent), transparent 70%);
+  }
+  .project-tag{
+    display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:10.5px;
+    color: var(--teal); background: color-mix(in srgb, var(--teal) 14%, transparent);
+    border:1px solid color-mix(in srgb, var(--teal) 40%, transparent);
+    padding:3px 9px; border-radius:5px; margin-bottom:12px;
+  }
+  .project-card h3{ font-size:17.5px; margin-bottom:10px; }
+  .project-card p{ color: var(--text-dim); font-size:14.5px; margin:0; }
+
+  /* ---------------- ACHIEVEMENTS ---------------- */
+  .ach-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap:18px; }
+  .ach-card{
+    background: var(--panel); border:1px solid var(--border); border-radius:12px;
+    padding:20px; box-shadow: var(--shadow); display:flex; gap:14px; align-items:flex-start;
+  }
+  .ach-emoji{
+    width:42px; height:42px; border-radius:10px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:19px;
+    background: linear-gradient(135deg, var(--gold), var(--coral));
+  }
+  .ach-card p{ margin:0; font-size:14.5px; color: var(--text-dim); }
+  .ach-card strong{ color: var(--text); }
+
+  /* ---------------- EDUCATION ---------------- */
+  .edu-card{
+    background: var(--panel); border:1px solid var(--border); border-radius:14px;
+    padding:26px; box-shadow: var(--shadow); max-width:640px;
+    border-left: 4px solid var(--violet);
+  }
+  .edu-card h3{ font-size:18px; margin-bottom:6px; }
+  .edu-card .meta{ color: var(--text-dim); font-size:14px; }
+  .edu-card .cgpa{
+    display:inline-block; margin-top:12px; font-family:'IBM Plex Mono', monospace; font-size:12.5px;
+    color: var(--gold); background: color-mix(in srgb, var(--gold) 14%, transparent);
+    border:1px solid color-mix(in srgb, var(--gold) 40%, transparent); padding:4px 10px; border-radius:6px;
+  }
+
+  /* ---------------- CONTACT ---------------- */
+  .contact-card{
+    background: linear-gradient(135deg, var(--panel), var(--panel-2));
+    border:1px solid var(--border); border-radius:18px; padding: 46px; text-align:center;
+    box-shadow: var(--shadow);
+  }
+  .contact-card h2{ font-size: clamp(24px,3.6vw,34px); margin-bottom:12px; }
+  .contact-card p{ color: var(--text-dim); margin-bottom:30px; }
+  .contact-actions{ display:flex; justify-content:center; flex-wrap:wrap; gap:14px; }
+  .toast{
+    position: fixed; bottom:26px; left:50%; transform: translateX(-50%) translateY(20px);
+    background: var(--teal); color:#0E1420; font-family:'IBM Plex Mono', monospace; font-size:13.5px;
+    padding: 12px 20px; border-radius:8px; opacity:0; pointer-events:none;
+    transition: opacity 0.3s ease, transform 0.3s ease; z-index: 200; font-weight:600;
+  }
+  .toast.show{ opacity:1; transform: translateX(-50%) translateY(0); }
+
+  footer{ padding: 34px 0 40px; text-align:center; }
+  footer p{ color: var(--text-dim); font-family:'IBM Plex Mono', monospace; font-size:11.5px; opacity:0.7; margin:0; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="brand"><span class="dot"></span>Pushpendra Tripathi</div>
+    <nav class="links" id="navLinks">
+      <a href="#about" class="nav-link active">About</a>
+      <a href="#experience" class="nav-link">Experience</a>
+      <a href="#skills" class="nav-link">Skills</a>
+      <a href="#projects" class="nav-link">Projects</a>
+      <a href="#achievements" class="nav-link">Achievements</a>
+      <a href="#contact" class="nav-link">Contact</a>
+    </nav>
+    <div style="display:flex; align-items:center;">
+      <button class="icon-btn" id="themeToggle" title="Toggle theme" aria-label="Toggle light and dark theme">🌙</button>
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">☰</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <section class="hero" id="top">
+    <div class="badge"><span class="live-dot"></span>Available for DevOps &amp; Cloud roles</div>
+    <h1 class="hero-title">Building reliable <span class="grad">cloud infrastructure</span><br>and CI/CD pipelines.</h1>
+    <p class="hero-sub">DevOps Engineer with 3.5+ years of experience across AWS, Jenkins, Terraform, Docker, and Kubernetes (EKS) — turning manual deployments into fast, automated, repeatable systems.</p>
+
+    <div class="hero-actions">
+      <a href="#experience" class="btn btn-grad">View Experience →</a>
+      <a href="#contact" class="btn btn-outline">Get in Touch</a>
+    </div>
+
+    <div class="stat-grid reveal" id="statGrid">
+      <div class="stat-card"><b data-count="3.5" data-suffix="+">0</b><span>Years experience</span></div>
+      <div class="stat-card"><b data-count="60" data-suffix="%">0</b><span>Faster deployments</span></div>
+      <div class="stat-card"><b data-count="50" data-suffix="%">0</b><span>Less manual effort</span></div>
+      <div class="stat-card"><b data-count="40" data-suffix="%">0</b><span>Lower op. overhead</span></div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="reveal">
+    <div class="sec-head">
+      <span class="sec-tag">01 · Profile</span>
+      <h2 class="sec-title">About</h2>
+      <span class="sec-rule"></span>
+    </div>
+    <div class="about-grid">
+      <p class="about-text">DevOps Engineer with <strong>3.5+ years of experience</strong> across AWS, Jenkins, Terraform, Docker, and Kubernetes (EKS). Focused on closing the gap between development and reliable, repeatable delivery — with a track record of <strong>60% faster deployments</strong>, <strong>50% less manual effort</strong>, and <strong>40% lower operational overhead</strong> through infrastructure automation and AI-driven tooling. Comfortable owning a pipeline end-to-end: provisioning infrastructure, wiring up builds, deploying containerized workloads, and keeping systems observable in production.</p>
+      <div class="about-card">
+        <h3 class="mono">QUICK FACTS</h3>
+        <div class="mini-row"><span>Location</span><span>Noida, Uttar Pradesh, IN</span></div>
+        <div class="mini-row"><span>Role</span><span>DevOps Engineer</span></div>
+        <div class="mini-row"><span>Cloud</span><span>AWS · Azure (Basic)</span></div>
+        <div class="mini-row"><span>Email</span><span><a href="mailto:pushpendratripathi303@gmail.com">contact</a></span></div>
+        <div class="mini-row"><span>Phone</span><span>+91 9935789907</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience" class="reveal">
+    <div class="sec-head">
+      <span class="sec-tag">02 · Career</span>
+      <h2 class="sec-title">Experience</h2>
+      <span class="sec-rule"></span>
+    </div>
+    <div class="timeline">
+      <div class="job">
+        <div class="job-card">
+          <div class="job-row"><span class="job-title">DevOps Engineer</span><span class="job-date">SEP 2022 — JUN 2026</span></div>
+          <div class="job-co">Coforge Ltd. · Greater Noida, U.P.</div>
+          <ul>
+            <li><span class="tag tag-cicd">CI/CD</span>Built Jenkins pipelines for enterprise Java applications, reducing deployment time by 60% and improving release stability.</li>
+            <li><span class="tag tag-iac">IAC</span>Automated AWS infrastructure provisioning with Terraform, cutting manual effort by 50% while ensuring reliable, repeatable deployments.</li>
+            <li><span class="tag tag-k8s">K8S</span>Deployed containerized applications on EKS using Kubernetes and Horizontal Pod Autoscaling for scalable, highly available workloads.</li>
+            <li><span class="tag tag-ops">OPS</span>Partnered cross-functionally with development teams to rapidly diagnose deployment issues, streamlining pipelines and improving system reliability.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="job">
+        <div class="job-card">
+          <div class="job-row"><span class="job-title">Trainee</span><span class="job-date">MAR 2022 — SEP 2022</span></div>
+          <div class="job-co">Coforge Ltd. · Greater Noida, U.P.</div>
+          <ul>
+            <li><span class="tag tag-iac">INIT</span>Contributed to CI/CD automation, Terraform-based infrastructure as code, AWS deployments, Docker, Kubernetes, and scripting.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills" class="reveal">
+    <div class="sec-head">
+      <span class="sec-tag">03 · Toolkit</span>
+      <h2 class="sec-title">Technical Skills</h2>
+      <span class="sec-rule"></span>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-card">
+        <h3>Cloud Platforms</h3>
+        <div class="chip-row">
+          <span class="chip">EC2</span><span class="chip">S3</span><span class="chip">IAM</span>
+          <span class="chip">VPC</span><span class="chip">Lambda</span><span class="chip">CloudWatch</span>
+          <span class="chip">EKS</span><span class="chip">Azure (Basic)</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <h3>Infrastructure as Code</h3>
+        <div class="chip-row"><span class="chip">Terraform</span><span class="chip">AWS CloudFormation</span></div>
+      </div>
+      <div class="skill-card">
+        <h3>Containers &amp; Orchestration</h3>
+        <div class="chip-row"><span class="chip">Docker</span><span class="chip">Kubernetes (EKS)</span><span class="chip">HPA</span></div>
+      </div>
+      <div class="skill-card">
+        <h3>CI/CD</h3>
+        <div class="chip-row"><span class="chip">Jenkins</span><span class="chip">GitLab CI/CD</span></div>
+      </div>
+      <div class="skill-card">
+        <h3>Version Control &amp; OS</h3>
+        <div class="chip-row">
+          <span class="chip">Git</span><span class="chip">GitHub</span><span class="chip">Ubuntu</span>
+          <span class="chip">CentOS</span><span class="chip">RHEL</span><span class="chip">Windows Server</span>
+        </div>
+      </div>
+      <div class="skill-card">
+        <h3>Build Tools &amp; Web Servers</h3>
+        <div class="chip-row"><span class="chip">Apache Maven</span><span class="chip">Nginx</span><span class="chip">Apache HTTP Server</span></div>
+      </div>
+      <div class="skill-card">
+        <h3>Scripting</h3>
+        <div class="chip-row"><span class="chip">Python</span><span class="chip">Shell Scripting</span></div>
+      </div>
+      <div class="skill-card">
+        <h3>Monitoring &amp; Logging</h3>
+        <div class="chip-row"><span class="chip">New Relic</span><span class="chip">CloudWatch</span><span class="chip">Nagios XI</span><span class="chip">Kafka</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects" class="reveal">
+    <div class="sec-head">
+      <span class="sec-tag">04 · Work</span>
+      <h2 class="sec-title">Projects</h2>
+      <span class="sec-rule"></span>
+    </div>
+    <div class="filter-row" id="filterRow">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="containers">Containers</button>
+      <button class="filter-btn" data-filter="infra">Infrastructure</button>
+    </div>
+    <div class="projects-grid" id="projectsGrid">
+      <div class="project-card" data-cat="containers">
+        <span class="project-tag">DOCKER · KUBERNETES</span>
+        <h3>Scalable Application Deployment on AWS EKS</h3>
+        <p>Deployed containerized applications on AWS EKS using Docker, Kubernetes, and Horizontal Pod Autoscaling to support scalable, highly available workloads.</p>
+      </div>
+      <div class="project-card" data-cat="infra">
+        <span class="project-tag">TERRAFORM · NGINX</span>
+        <h3>Secure Website Deployment on AWS</h3>
+        <p>Configured Amazon S3, Nginx, VPC CIDR blocks, and Security Groups with Terraform to automate secure and reliable application deployments.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACHIEVEMENTS -->
+  <section id="achievements" class="reveal">
+    <div class="sec-head">
+      <span class="sec-tag">05 · Recognition</span>
+      <h2 class="sec-title">Achievements &amp; Leadership</h2>
+      <span class="sec-rule"></span>
+    </div>
+    <div class="ach-grid">
+      <div class="ach-card">
+        <div class="ach-emoji">🏆</div>
+        <p><strong>Coforge Appreciation Award (2026)</strong><br>Recognized for exceptional performance and outstanding achievements.</p>
+      </div>
+      <div class="ach-card">
+        <div class="ach-emoji">🤝</div>
+        <p><strong>Coforge Collaboration Award (2025)</strong><br>Recognized for exceptional client delivery and team performance.</p>
+      </div>
+      <div class="ach-card">
+        <div class="ach-emoji">🧭</div>
+        <p><strong>Team Leadership &amp; Mentorship</strong><br>Led Agile sprint planning, task allocation, and blocker resolution; ran daily stand-ups and mentored junior engineers through KT sessions.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- EDUCATION -->
+  <section id="education" class="reveal">
+    <div class="sec-head">
+      <span class="sec-tag">06 · Education</span>
+      <h2 class="sec-title">Education</h2>
+      <span class="sec-rule"></span>
+    </div>
+    <div class="edu-card">
+      <h3>Bachelor of Technology, Computer Science &amp; Engineering</h3>
+      <div class="meta">Amity University, Lucknow, Uttar Pradesh · 2018 – 2022</div>
+      <div class="cgpa">CGPA: 7.10 / 10.00</div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="reveal">
+    <div class="contact-card">
+      <h2>Let's build something reliable.</h2>
+      <p>Open to DevOps and Cloud Infrastructure roles — reach out any time.</p>
+      <div class="contact-actions">
+        <button class="btn btn-grad" id="copyEmailBtn">📋 Copy Email</button>
+        <a href="tel:+919935789907" class="btn btn-outline">Call</a>
+        <a href="https://www.linkedin.com/in/pushpendra-tripathi-248b4b179/" target="_blank" rel="noopener" class="btn btn-outline">LinkedIn</a>
+        <a href="https://github.com/Pushpendra-99" target="_blank" rel="noopener" class="btn btn-outline">GitHub</a>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <p>PUSHPENDRA TRIPATHI · DEVOPS ENGINEER · NOIDA, INDIA</p>
+</footer>
+
+<div class="toast" id="toast">Email copied to clipboard</div>
+
+<script>
+(function(){
+  // ---------- Mobile menu ----------
+  var menuToggle = document.getElementById('menuToggle');
+  var navLinks = document.getElementById('navLinks');
+  menuToggle.addEventListener('click', function(){
+    navLinks.classList.toggle('open');
+  });
+  navLinks.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){ navLinks.classList.remove('open'); });
+  });
+
+  // ---------- Theme toggle ----------
+  var themeToggle = document.getElementById('themeToggle');
+  var root = document.documentElement;
+  themeToggle.addEventListener('click', function(){
+    var current = root.getAttribute('data-theme');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    themeToggle.textContent = next === 'dark' ? '🌙' : '☀️';
+  });
+
+  // ---------- Active nav link on scroll ----------
+  var sections = document.querySelectorAll('section[id]');
+  var navA = document.querySelectorAll('.nav-link');
+  var navObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        navA.forEach(function(a){ a.classList.remove('active'); });
+        var match = document.querySelector('.nav-link[href="#' + entry.target.id + '"]');
+        if(match) match.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-45% 0px -50% 0px' });
+  sections.forEach(function(s){ navObserver.observe(s); });
+
+  // ---------- Scroll reveal ----------
+  var revealEls = document.querySelectorAll('.reveal');
+  var revealObserver = new IntersectionObserver(function(entries, obs){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        entry.target.classList.add('in');
+        obs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  revealEls.forEach(function(el){ revealObserver.observe(el); });
+
+  // ---------- Animated stat counters ----------
+  var counted = false;
+  var statGrid = document.getElementById('statGrid');
+  var counterObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting && !counted){
+        counted = true;
+        document.querySelectorAll('[data-count]').forEach(function(el){
+          var target = parseFloat(el.getAttribute('data-count'));
+          var suffix = el.getAttribute('data-suffix') || '';
+          var isDecimal = target % 1 !== 0;
+          var startTime = null;
+          var duration = 1200;
+          function step(ts){
+            if(!startTime) startTime = ts;
+            var progress = Math.min((ts - startTime) / duration, 1);
+            var value = progress * target;
+            el.textContent = (isDecimal ? value.toFixed(1) : Math.round(value)) + suffix;
+            if(progress < 1) requestAnimationFrame(step);
+          }
+          requestAnimationFrame(step);
+        });
+      }
+    });
+  }, { threshold: 0.4 });
+  counterObserver.observe(statGrid);
+
+  // ---------- Project filter ----------
+  var filterButtons = document.querySelectorAll('.filter-btn');
+  var projectCards = document.querySelectorAll('.project-card');
+  filterButtons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      filterButtons.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      var filter = btn.getAttribute('data-filter');
+      projectCards.forEach(function(card){
+        var show = filter === 'all' || card.getAttribute('data-cat') === filter;
+        card.style.display = show ? '' : 'none';
+      });
+    });
+  });
+
+  // ---------- Copy email + toast ----------
+  var copyBtn = document.getElementById('copyEmailBtn');
+  var toast = document.getElementById('toast');
+  var toastTimer;
+  copyBtn.addEventListener('click', function(){
+    var email = 'pushpendratripathi303@gmail.com';
+    function showToast(msg){
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 2200);
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(email).then(function(){
+        showToast('Email copied to clipboard');
+      }).catch(function(){
+        showToast(email);
+      });
+    } else {
+      showToast(email);
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
