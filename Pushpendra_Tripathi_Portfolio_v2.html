@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pushpendra Tripathi — DevOps Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A1120; --bg-alt:#0E1729; --surface:#121D33; --surface-2:#17233C;
+    --line:#223154; --line-soft:#1A2740; --text:#E7EDF7; --text-muted:#90A0BE;
+    --text-dim:#5D6E8F; --mint:#5EEAD4; --amber:#F5A623; --radius:10px; --maxw:1080px;
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    position:relative; background:var(--bg); color:var(--text);
+    font-family:'IBM Plex Sans', ui-sans-serif, sans-serif; line-height:1.6; min-height:100vh;
+    isolation:isolate; overflow-x:hidden; -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background:var(--mint); color:#041018; }
+  a{ color:inherit; text-decoration:none; }
+  .mono{ font-family:'IBM Plex Mono', monospace; }
+  .wrap{ max-width:var(--maxw); margin:0 auto; padding:0 28px; position:relative; z-index:2; }
+
+  #network-canvas{ position:fixed; inset:0; z-index:0; pointer-events:none; }
+  .bg-glow{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(circle at 12% -5%, rgba(94,234,212,0.09), transparent 42%),
+      radial-gradient(circle at 90% 15%, rgba(245,166,35,0.07), transparent 38%),
+      radial-gradient(circle at 50% 100%, rgba(94,234,212,0.05), transparent 45%);
+  }
+  .grid-overlay{
+    position:fixed; inset:0; z-index:0; pointer-events:none; opacity:0.35;
+    background-image:
+      linear-gradient(rgba(94,234,212,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(94,234,212,0.035) 1px, transparent 1px);
+    background-size:42px 42px;
+    -webkit-mask-image:linear-gradient(to bottom, black, transparent 75%);
+    mask-image:linear-gradient(to bottom, black, transparent 75%);
+  }
+
+  /* ---------- NAV ---------- */
+  header.nav{ position:sticky; top:0; z-index:50; backdrop-filter:blur(10px);
+    background:rgba(10,17,32,0.82); border-bottom:1px solid var(--line-soft); }
+  .nav-inner{ max-width:var(--maxw); margin:0 auto; padding:16px 28px;
+    display:flex; align-items:center; justify-content:space-between; }
+  .nav-brand{ font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:14px;
+    display:flex; align-items:center; gap:8px; }
+  .nav-brand .dot{ width:8px; height:8px; border-radius:50%; background:var(--mint);
+    box-shadow:0 0 8px var(--mint); animation:blink 2.4s ease-in-out infinite; }
+  @keyframes blink{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
+  .navlinks{ display:flex; gap:26px; font-size:13px; color:var(--text-muted); }
+  .navlinks button{ background:none; border:none; color:inherit; font:inherit; cursor:pointer;
+    transition:color .2s ease; padding:4px 0; }
+  .navlinks button.active, .navlinks button:hover{ color:var(--mint); }
+  .menu-btn{ display:none; background:none; border:1px solid var(--line); border-radius:6px;
+    color:var(--text); padding:6px 8px; cursor:pointer; }
+  .mobile-menu{ display:none; flex-direction:column; gap:2px; padding:8px 28px 18px;
+    border-bottom:1px solid var(--line-soft); position:relative; z-index:50; background:var(--bg); }
+  .mobile-menu button{ background:none; border:none; color:var(--text-muted); text-align:left;
+    padding:10px 0; font-size:14px; cursor:pointer; }
+  .mobile-menu button.active{ color:var(--mint); }
+
+  section{ padding:72px 0; border-bottom:1px solid var(--line-soft); position:relative; z-index:2; }
+  section:last-of-type{ border-bottom:none; }
+  .hero{ padding:88px 0 0; border-bottom:none; position:relative; }
+  .hero-grid{ display:grid; grid-template-columns:1.2fr .8fr; gap:40px; align-items:center; }
+  .spotlight{ position:absolute; inset:0; z-index:0; pointer-events:none; opacity:0; transition:opacity .3s ease;
+    background:radial-gradient(320px circle at var(--sx,50%) var(--sy,50%), rgba(94,234,212,0.08), transparent 70%); }
+  .spotlight.on{ opacity:1; }
+  .hero-text{ position:relative; z-index:1; }
+
+  .eyebrow{ font-family:'IBM Plex Mono',monospace; font-size:12.5px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--mint); display:flex; align-items:center; gap:10px; margin-bottom:22px; }
+  .eyebrow::before{ content:''; width:22px; height:1px; background:var(--mint); }
+  .name{ font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:clamp(32px,6vw,56px);
+    line-height:1.08; letter-spacing:-.01em; margin:0 0 14px; }
+  .name .dim{ color:var(--text-dim); }
+  .role{ font-size:clamp(16px,2.4vw,20px); color:var(--text-muted); max-width:640px; margin-bottom:22px; }
+  .role strong{ color:var(--text); font-weight:600; }
+
+  .terminal{ font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--mint);
+    background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:10px 14px;
+    display:inline-flex; align-items:center; gap:8px; margin-bottom:30px; max-width:100%; overflow:hidden; }
+  .terminal .prompt{ color:var(--amber); flex-shrink:0; }
+  .terminal .caret{ display:inline-block; width:7px; height:15px; background:var(--mint);
+    animation:caret 1s steps(1) infinite; flex-shrink:0; }
+  @keyframes caret{ 50%{ opacity:0; } }
+
+  .meta{ display:flex; flex-wrap:wrap; gap:10px 14px; margin-bottom:36px; }
+  .chip{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--text-muted);
+    border:1px solid var(--line); background:var(--surface); padding:6px 12px; border-radius:999px;
+    display:flex; align-items:center; gap:7px; }
+  .cta{ display:flex; gap:14px; flex-wrap:wrap; margin-bottom:60px; }
+  .btn{ font-family:'IBM Plex Mono',monospace; font-size:13.5px; font-weight:500; padding:12px 22px;
+    border-radius:8px; display:inline-flex; align-items:center; gap:8px; transition:all .2s ease;
+    border:1px solid transparent; cursor:pointer; text-decoration:none; }
+  .btn-primary{ background:var(--mint); color:#041018; }
+  .btn-primary:hover{ background:#7FF3E1; transform:translateY(-1px); }
+  .btn-ghost{ border-color:var(--line); color:var(--text); background:transparent; }
+  .btn-ghost:hover{ border-color:var(--mint); color:var(--mint); }
+
+  .diagram{ position:relative; height:320px; display:flex; align-items:center; justify-content:center; }
+  .diagram svg{ position:absolute; inset:0; width:100%; height:100%; }
+  .diagram-path{ fill:none; stroke:var(--mint); stroke-width:1.5; stroke-dasharray:6 6;
+    opacity:0.45; animation:dash 22s linear infinite; }
+  @keyframes dash{ to{ stroke-dashoffset:-400; } }
+  .node{ position:absolute; width:auto; height:auto; display:flex; align-items:center; justify-content:center;
+    color:var(--mint); animation:float 5s ease-in-out infinite; filter:drop-shadow(0 4px 10px rgba(0,0,0,0.4)); }
+  .node.amber{ color:var(--amber); }
+  .node span{ position:absolute; bottom:-30px; font-family:'IBM Plex Mono',monospace; font-size:11px;
+    color:var(--text-dim); white-space:nowrap; left:50%; transform:translateX(-50%); }
+  @keyframes float{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-8px); } }
+  .node.n1{ top:12%; left:8%; }
+  .node.n2{ top:8%; right:10%; animation-delay:.6s; }
+  .node.n3{ bottom:16%; left:14%; animation-delay:1.2s; }
+  .node.n4{ bottom:10%; right:6%; animation-delay:1.8s; }
+  .node.n5{ top:44%; left:50%; transform:translateX(-50%); animation-delay:.3s; }
+
+  .pipeline{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:26px 28px 22px; overflow-x:auto; margin-bottom:88px; }
+  .pipe-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;
+    font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--text-dim); }
+  .pipe-status{ color:var(--mint); display:flex; align-items:center; gap:6px; }
+  .pipe-status .dot{ width:6px; height:6px; border-radius:50%; background:var(--mint); }
+  .track{ position:relative; display:flex; justify-content:space-between; min-width:560px; }
+  .track::before{ content:''; position:absolute; top:17px; left:20px; right:20px; height:2px; background:var(--line); }
+  .progress{ position:absolute; top:17px; left:20px; height:2px;
+    background:linear-gradient(90deg,var(--mint),var(--amber)); transition:width .5s ease; width:0%; }
+  .stage{ position:relative; display:flex; flex-direction:column; align-items:center; gap:10px; width:108px; z-index:2; }
+  .stage-node{ width:36px; height:36px; border-radius:50%; background:var(--bg-alt);
+    border:2px solid var(--line); display:flex; align-items:center; justify-content:center;
+    color:var(--text-dim); transition:all .35s ease; }
+  .stage.active .stage-node{ border-color:var(--mint); color:var(--mint); box-shadow:0 0 14px rgba(94,234,212,0.35); }
+  .stage.done .stage-node{ border-color:var(--mint); color:var(--mint); }
+  .stage-label{ font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-dim); text-align:center; }
+  .stage.active .stage-label{ color:var(--text-muted); }
+
+  .section-head{ display:flex; align-items:baseline; gap:16px; margin-bottom:40px; flex-wrap:wrap; position:relative; z-index:1; }
+  .section-icon{ width:34px; height:34px; border-radius:9px; background:var(--surface);
+    border:1px solid var(--line); color:var(--mint); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .section-title{ font-family:'IBM Plex Mono',monospace; font-size:22px; font-weight:600; color:var(--text); }
+  .section-title span{ color:var(--mint); }
+  .section-line{ flex:1; height:1px; background:var(--line-soft); min-width:24px; }
+  .filter-chip{ font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--amber);
+    background:rgba(245,166,35,0.1); border:1px solid rgba(245,166,35,0.35); border-radius:999px;
+    padding:5px 10px; display:none; align-items:center; gap:6px; cursor:pointer; }
+  .filter-chip.show{ display:inline-flex; }
+
+  .watermark{ position:absolute; top:8px; right:0; color:var(--mint); opacity:0.05; z-index:0; pointer-events:none; }
+
+  .summary-text{ font-size:16.5px; color:var(--text-muted); max-width:760px; position:relative; z-index:1; }
+  .summary-text strong{ color:var(--text); font-weight:600; }
+
+  .reveal{ opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s ease; }
+  .reveal.is-visible{ opacity:1; transform:translateY(0); }
+
+  .metrics-row{ display:flex; gap:36px; flex-wrap:wrap; margin-bottom:48px; padding:28px;
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); position:relative; z-index:1; }
+  .radial{ display:flex; align-items:center; gap:14px; position:relative; }
+  .radial-svg{ width:64px; height:64px; flex-shrink:0; }
+  .radial-svg circle:nth-child(2){ transition:stroke-dashoffset 1.4s cubic-bezier(.16,1,.3,1); }
+  .radial-value{ position:absolute; left:0; top:0; width:64px; height:64px; display:flex;
+    align-items:center; justify-content:center; font-size:13px; font-weight:700; color:var(--text); }
+  .radial-text{ padding-left:6px; }
+  .radial-label{ font-size:13.5px; font-weight:600; color:var(--text); }
+  .radial-sublabel{ font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-dim); margin-top:2px; }
+
+  .statchip-row{ display:flex; gap:14px; flex-wrap:wrap; margin-bottom:40px; position:relative; z-index:1; }
+  .statchip{ display:flex; align-items:center; gap:12px; background:var(--surface);
+    border:1px solid var(--line); border-radius:10px; padding:14px 18px; flex:1; min-width:150px; }
+  .statchip-icon{ width:32px; height:32px; border-radius:8px; background:rgba(94,234,212,0.1);
+    border:1px solid rgba(94,234,212,0.25); color:var(--mint); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .statchip-value{ font-size:18px; font-weight:700; color:var(--text); line-height:1.1; }
+  .statchip-label{ font-size:11.5px; color:var(--text-dim); margin-top:2px; }
+
+  .divider{ display:flex; align-items:center; justify-content:center; padding:0 0 48px; position:relative; z-index:2; }
+  .divider-line{ height:1px; width:120px; background:linear-gradient(90deg, transparent, var(--line), transparent); }
+  .divider-node{ width:7px; height:7px; border-radius:50%; background:var(--mint); margin:0 10px;
+    box-shadow:0 0 10px rgba(94,234,212,0.5); flex-shrink:0; animation:blink 3s ease-in-out infinite; }
+
+  .corner{ position:absolute; width:12px; height:12px; opacity:0.55; pointer-events:none; z-index:3; }
+  .corner-tl{ top:-1px; left:-1px; border-top:2px solid var(--mint); border-left:2px solid var(--mint); }
+  .corner-br{ bottom:-1px; right:-1px; border-bottom:2px solid var(--mint); border-right:2px solid var(--mint); }
+
+  .timeline{ position:relative; z-index:1; }
+  .timeline::before{ content:''; position:absolute; left:7px; top:8px; bottom:8px; width:2px; background:var(--line); }
+  .commit{ position:relative; padding-left:40px; margin-bottom:44px; }
+  .commit:last-child{ margin-bottom:0; }
+  .commit::before{ content:''; position:absolute; left:0; top:6px; width:16px; height:16px;
+    border-radius:50%; background:var(--bg); border:2px solid var(--mint); }
+  .commit::after{ content:''; position:absolute; left:5px; top:10px; width:6px; height:6px;
+    border-radius:50%; background:var(--mint); }
+  .commit-head{ display:flex; flex-wrap:wrap; align-items:baseline; gap:10px 16px; margin-bottom:6px; }
+  .commit-role{ font-size:18px; font-weight:600; color:var(--text); }
+  .commit-org{ color:var(--mint); font-weight:600; }
+  .commit-date{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--text-dim); margin-left:auto; }
+  .commit-loc{ font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--text-dim); margin-bottom:16px; }
+  .commit ul{ list-style:none; display:flex; flex-direction:column; gap:12px; }
+  .commit li{ position:relative; padding-left:20px; color:var(--text-muted); font-size:14.5px; }
+  .commit li::before{ content:'▸'; position:absolute; left:0; top:0; color:var(--amber); font-size:12px; }
+  .commit li strong{ color:var(--text); font-weight:600; }
+
+  .projects-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:22px; position:relative; z-index:1; }
+  .card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:26px; transition:transform .15s ease, box-shadow .25s ease, border-color .25s ease, opacity .25s ease;
+    position:relative; overflow:hidden; transform-style:preserve-3d; will-change:transform; }
+  .card::before{ content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg,var(--mint),var(--amber)); transform:scaleX(0);
+    transform-origin:left; transition:transform .35s ease; }
+  .card:hover{ box-shadow:0 16px 36px rgba(0,0,0,0.4); }
+  .card:hover::before{ transform:scaleX(1); }
+  .card.match{ border-color:var(--mint); box-shadow:0 0 0 1px var(--mint), 0 16px 36px rgba(0,0,0,0.4); }
+  .card.dim{ opacity:0.4; }
+  .card-top{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
+  .card-icon{ width:38px; height:38px; border-radius:8px; background:var(--surface-2);
+    border:1px solid var(--line); display:flex; align-items:center; justify-content:center; color:var(--mint); }
+  .card-date{ font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-dim); }
+  .card-title{ font-size:17px; font-weight:600; color:var(--text); margin-bottom:10px; }
+  .card-desc{ font-size:14px; color:var(--text-muted); margin-bottom:18px; }
+  .tag-row{ display:flex; flex-wrap:wrap; gap:8px; }
+  .tag{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--mint);
+    background:rgba(94,234,212,0.08); border:1px solid rgba(94,234,212,0.25); padding:4px 9px; border-radius:5px;
+    cursor:pointer; transition:all .2s ease; }
+  .tag:hover, .tag.active{ background:var(--mint); color:#041018; }
+
+  .stack{ display:flex; flex-direction:column; gap:2px; border-radius:var(--radius); overflow:hidden;
+    border:1px solid var(--line); position:relative; z-index:1; }
+  .stack-layer{ display:grid; grid-template-columns:200px 1fr; background:var(--surface);
+    border-bottom:1px solid var(--line-soft); transition:background .2s ease; }
+  .stack-layer:last-child{ border-bottom:none; }
+  .stack-layer:hover{ background:var(--surface-2); }
+  .stack-label{ font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--text-dim);
+    padding:20px 22px; border-right:1px solid var(--line-soft); display:flex; align-items:center; gap:8px; }
+  .stack-icon{ display:flex; color:var(--mint); }
+  .stack-items{ padding:18px 22px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+  .skill-pill{ font-size:13px; color:var(--text); background:var(--bg-alt); border:1px solid var(--line);
+    padding:6px 13px; border-radius:999px; cursor:pointer; transition:all .2s ease; }
+  .skill-pill:hover{ border-color:var(--mint); color:var(--mint); }
+  .skill-pill.active{ background:var(--mint); color:#041018; border-color:var(--mint); }
+
+  .two-col{ display:grid; grid-template-columns:1.1fr .9fr; gap:40px; position:relative; z-index:1; }
+  .edu-card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:26px; position:relative; }
+  .edu-degree{ font-size:16px; font-weight:600; margin-bottom:4px; display:flex; align-items:center; gap:10px; }
+  .edu-school{ color:var(--mint); font-size:14px; margin-bottom:10px; font-weight:600; }
+  .edu-meta{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--text-dim); display:flex; justify-content:space-between; }
+  .edu-radial{ display:flex; align-items:center; gap:16px; margin-top:16px; padding-top:16px; border-top:1px solid var(--line-soft); }
+  .badge-list{ display:flex; flex-direction:column; gap:14px; }
+  .badge{ display:flex; gap:14px; align-items:flex-start; background:var(--surface);
+    border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px; }
+  .badge-icon{ width:34px; height:34px; flex-shrink:0; border-radius:8px; background:rgba(245,166,35,0.1);
+    border:1px solid rgba(245,166,35,0.3); display:flex; align-items:center; justify-content:center; color:var(--amber); }
+  .badge-title{ font-size:14px; font-weight:600; color:var(--text); margin-bottom:2px; }
+  .badge-desc{ font-size:12.5px; color:var(--text-dim); }
+
+  .footer{ padding:64px 0 48px; }
+  .contact-inner{ display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:30px; }
+  .contact-title{ font-family:'IBM Plex Mono',monospace; font-size:clamp(24px,4vw,34px); font-weight:700; margin-bottom:14px; }
+  .contact-title span{ color:var(--mint); }
+  .contact-sub{ color:var(--text-muted); font-size:14.5px; max-width:420px; }
+  .contact-links{ display:flex; flex-direction:column; gap:10px; }
+  .contact-links button, .contact-links a{ font-family:'IBM Plex Mono',monospace; font-size:13.5px;
+    color:var(--text-muted); display:flex; align-items:center; gap:10px; transition:color .2s ease;
+    background:none; border:none; cursor:pointer; text-decoration:none; padding:0; }
+  .contact-links button:hover, .contact-links a:hover{ color:var(--mint); }
+  .copied{ color:var(--mint) !important; }
+  .foot-bar{ margin-top:56px; padding-top:24px; border-top:1px solid var(--line-soft); display:flex;
+    justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--text-dim); flex-wrap:wrap; gap:10px; }
+
+  @media (max-width:900px){
+    .hero-grid{ grid-template-columns:1fr; }
+    .diagram{ height:220px; order:-1; }
+  }
+  @media (max-width:760px){
+    .projects-grid{ grid-template-columns:1fr; }
+    .two-col{ grid-template-columns:1fr; }
+    .stack-layer{ grid-template-columns:1fr; }
+    .stack-label{ border-right:none; border-bottom:1px solid var(--line-soft); padding:14px 18px; }
+    .commit-date{ margin-left:0; }
+    .navlinks{ display:none; }
+    .menu-btn{ display:flex; }
+    .mobile-menu.open{ display:flex; }
+    .track{ min-width:480px; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+  a:focus-visible, button:focus-visible{ outline:2px solid var(--mint); outline-offset:3px; }
+
+  svg.icon{ width:1em; height:1em; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+</style>
+</head>
+<body>
+
+<canvas id="network-canvas" aria-hidden="true"></canvas>
+<div class="bg-glow"></div>
+<div class="grid-overlay"></div>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand"><span class="dot"></span>pushpendra@devops:~$</div>
+    <nav class="navlinks" id="navlinks">
+      <button data-target="summary">summary</button>
+      <button data-target="experience">experience</button>
+      <button data-target="projects">projects</button>
+      <button data-target="skills">skills</button>
+      <button data-target="contact">contact</button>
+    </nav>
+    <button class="menu-btn" id="menuBtn" aria-label="Toggle menu">
+      <svg class="icon" viewBox="0 0 24 24" width="18" height="18"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <button data-target="summary">summary</button>
+    <button data-target="experience">experience</button>
+    <button data-target="projects">projects</button>
+    <button data-target="skills">skills</button>
+    <button data-target="contact">contact</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- HERO -->
+  <section class="hero" id="heroSection">
+    <div class="spotlight" id="spotlight"></div>
+    <div class="hero-grid">
+      <div class="hero-text">
+        <div class="eyebrow">Available for opportunities</div>
+        <h1 class="name">Pushpendra <span class="dim">Tripathi</span></h1>
+        <p class="role">
+          <strong>DevOps Engineer</strong> — automating cloud-native infrastructure on AWS with
+          Terraform, Docker and Kubernetes. 3 Years 9 Months turning manual deployments into repeatable,
+          self-healing pipelines.
+        </p>
+
+        <div class="terminal">
+          <span class="prompt">$</span>
+          <span id="typed"></span>
+          <span class="caret"></span>
+        </div>
+
+        <div class="meta">
+          <span class="chip"><svg class="icon" viewBox="0 0 24 24" width="13" height="13"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>Noida, Uttar Pradesh, India</span>
+          <span class="chip"><svg class="icon" viewBox="0 0 24 24" width="13" height="13"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>+91 9935789907</span>
+          <span class="chip"><svg class="icon" viewBox="0 0 24 24" width="13" height="13"><path d="M22 6l-10 7L2 6"/><path d="M2 6h20v12H2z"/></svg>pushpendratripathi303@gmail.com</span>
+        </div>
+
+        <div class="cta">
+          <a class="btn btn-primary" href="mailto:pushpendratripathi303@gmail.com">
+            <svg class="icon" viewBox="0 0 24 24" width="15" height="15"><path d="M22 6l-10 7L2 6"/><path d="M2 6h20v12H2z"/></svg>
+            Get in touch
+          </a>
+          <a class="btn btn-ghost" href="https://linkedin.com/in/pushpendra-tripathi-248b4b179" target="_blank" rel="noopener">
+            <svg class="icon" viewBox="0 0 24 24" width="15" height="15"><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/><path d="M10 9h4v2s1-2 4-2c3 0 4 2 4 5v7h-4v-6c0-2-1-3-2-3s-2 1-2 3v6h-4z"/></svg>
+            LinkedIn
+          </a>
+          <a class="btn btn-ghost" href="https://github.com/Pushpendra-99" target="_blank" rel="noopener">
+            <svg class="icon" viewBox="0 0 24 24" width="15" height="15"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-1-2.6c3 0 6-2 6-5.5.1-1.3-.4-2.6-1.2-3.6.2-1 .2-2.1-.2-3.1 0 0-1 0-3 1.2a10.6 10.6 0 0 0-5.6 0C8 3.7 7 3.7 7 3.7c-.4 1-.4 2.1-.2 3.1A5.5 5.5 0 0 0 5.6 10.4c0 3.5 3 5.4 6 5.5a3.4 3.4 0 0 0-.9 2.5V22"/></svg>
+            GitHub
+          </a>
+        </div>
+      </div>
+
+      <!-- Decorative infra diagram -->
+      <div class="diagram" aria-hidden="true">
+        <svg viewBox="0 0 300 260">
+          <path class="diagram-path" d="M40 40 L150 130 L260 40" />
+          <path class="diagram-path" d="M40 220 L150 130 L260 220" />
+        </svg>
+        <div class="node n1"><svg class="icon" viewBox="0 0 24 24" width="52" height="52"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h.79a4.5 4.5 0 1 1 0 9z"/></svg><span>AWS</span></div>
+        <div class="node n2 amber"><svg class="icon" viewBox="0 0 24 24" width="52" height="52"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg><span>IAM</span></div>
+        <div class="node n3"><svg class="icon" viewBox="0 0 24 24" width="52" height="52"><rect x="2" y="3" width="20" height="7" rx="1"/><rect x="2" y="14" width="20" height="7" rx="1"/><line x1="6" y1="6.5" x2="6.01" y2="6.5"/><line x1="6" y1="17.5" x2="6.01" y2="17.5"/></svg><span>EKS</span></div>
+        <div class="node n4 amber"><svg class="icon" viewBox="0 0 24 24" width="52" height="52"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg><span>RDS</span></div>
+        <div class="node n5"><svg class="icon" viewBox="0 0 24 24" width="66" height="66"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg><span>Docker</span></div>
+      </div>
+    </div>
+
+    <!-- Animated pipeline -->
+    <div class="pipeline">
+      <div class="pipe-head">
+        <span>deploy.yml — main branch</span>
+        <span class="pipe-status"><span class="dot"></span>pipeline running</span>
+      </div>
+      <div class="track">
+        <div class="progress" id="pipeProgress"></div>
+        <div class="stage" data-stage="0">
+          <div class="stage-node"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.2 4.2l2.9 2.9M16.9 16.9l2.9 2.9M1 12h4M19 12h4M4.2 19.8l2.9-2.9M16.9 7.1l2.9-2.9"/></svg></div>
+          <div class="stage-label">Commit</div>
+        </div>
+        <div class="stage" data-stage="1">
+          <div class="stage-node"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg></div>
+          <div class="stage-label">Build</div>
+        </div>
+        <div class="stage" data-stage="2">
+          <div class="stage-node"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+          <div class="stage-label">Test</div>
+        </div>
+        <div class="stage" data-stage="3">
+          <div class="stage-node"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+          <div class="stage-label">Deploy · EKS</div>
+        </div>
+        <div class="stage" data-stage="4">
+          <div class="stage-node"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+          <div class="stage-label">Monitor</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUMMARY -->
+  <section id="summary" class="reveal">
+    <div class="watermark"><svg class="icon" viewBox="0 0 24 24" width="220" height="220" stroke-width="0.6"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
+    <div class="section-head">
+      <div class="section-icon"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><path d="M4 17l6-6-6-6M12 19h8"/></svg></div>
+      <span class="section-title">Summary</span>
+      <span class="section-line"></span>
+    </div>
+    <p class="summary-text">
+      DevOps Engineer with <strong>3 Years 9 Months</strong> of experience designing and automating
+      cloud-native infrastructure on <strong>AWS</strong> using Terraform, CloudFormation, Docker,
+      and Kubernetes (Amazon EKS). Skilled in building scalable CI/CD pipelines and delivering
+      secure, highly available, and resilient production environments — with a focus on driving
+      automation, improving system reliability, and enabling operational excellence.
+    </p>
+  </section>
+
+  <div class="divider" aria-hidden="true"><span class="divider-line"></span><span class="divider-node"></span><span class="divider-line"></span></div>
+
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <div class="watermark"><svg class="icon" viewBox="0 0 24 24" width="220" height="220" stroke-width="0.6"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg></div>
+    <div class="section-head">
+      <div class="section-icon"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg></div>
+      <span class="section-title">Experience <span>log</span></span>
+      <span class="section-line"></span>
+    </div>
+
+    <div class="metrics-row">
+      <div class="radial" data-percent="60">
+        <svg viewBox="0 0 72 72" class="radial-svg">
+          <circle cx="36" cy="36" r="30" fill="none" stroke="var(--line)" stroke-width="6"/>
+          <circle class="radial-fill" cx="36" cy="36" r="30" fill="none" stroke="var(--mint)" stroke-width="6"
+            stroke-dasharray="188.5" stroke-dashoffset="188.5" stroke-linecap="round" transform="rotate(-90 36 36)"/>
+        </svg>
+        <div class="radial-value mono"><span class="radial-num">0</span>%</div>
+        <div class="radial-text">
+          <div class="radial-label">Faster deployments</div>
+          <div class="radial-sublabel">via Jenkins &amp; GitLab CI/CD</div>
+        </div>
+      </div>
+      <div class="radial" data-percent="50">
+        <svg viewBox="0 0 72 72" class="radial-svg">
+          <circle cx="36" cy="36" r="30" fill="none" stroke="var(--line)" stroke-width="6"/>
+          <circle class="radial-fill" cx="36" cy="36" r="30" fill="none" stroke="var(--amber)" stroke-width="6"
+            stroke-dasharray="188.5" stroke-dashoffset="188.5" stroke-linecap="round" transform="rotate(-90 36 36)"/>
+        </svg>
+        <div class="radial-value mono"><span class="radial-num">0</span>%</div>
+        <div class="radial-text">
+          <div class="radial-label">Less manual effort</div>
+          <div class="radial-sublabel">via Terraform (IaC)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="timeline">
+      <div class="commit reveal">
+        <div class="commit-head">
+          <span class="commit-role">Software Engineer — DevOps</span>
+          <span class="commit-org">@ Coforge Ltd.</span>
+          <span class="commit-date">Sep 2022 → Jun 2026</span>
+        </div>
+        <div class="commit-loc">Greater Noida, Uttar Pradesh</div>
+        <ul>
+          <li>Designed and maintained scalable <strong>CI/CD pipelines</strong> using Jenkins and GitLab CI/CD for enterprise Java and microservices apps — <strong>cut deployment time by 60%</strong> and improved release reliability.</li>
+          <li>Automated cloud infrastructure provisioning on AWS using <strong>Terraform (IaC)</strong>, enabling repeatable, version-controlled deployments and <strong>reducing manual effort by 50%</strong>.</li>
+          <li>Built and shipped containerized apps via <strong>Docker → Amazon EKS</strong>, implementing HPA, rolling updates, self-healing, and service discovery for zero-downtime deployments.</li>
+          <li>Managed AWS services spanning <strong>EC2, EKS, IAM, VPC, S3, Lambda, CloudWatch</strong>, Auto Scaling, and Load Balancers, following security best practices.</li>
+          <li>Implemented monitoring &amp; alerting with <strong>Prometheus, Grafana, New Relic, CloudWatch</strong> — enabling proactive incident detection, root-cause analysis, and automated failover/rollback.</li>
+          <li>Automated operational tasks with <strong>Bash/Shell scripting</strong>, and led Agile sprint planning while mentoring junior engineers through KT sessions.</li>
+        </ul>
+      </div>
+      <div class="commit reveal">
+        <div class="commit-head">
+          <span class="commit-role">DevOps Engineer Intern</span>
+          <span class="commit-org">@ Coforge Ltd.</span>
+          <span class="commit-date">Mar 2022 → Sep 2022</span>
+        </div>
+        <div class="commit-loc">Greater Noida, Uttar Pradesh</div>
+        <ul>
+          <li>Built foundational skills in <strong>CI/CD automation, Terraform (IaC), AWS deployments, Docker, and Kubernetes</strong> while contributing to production support and deployment scripting.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider" aria-hidden="true"><span class="divider-line"></span><span class="divider-node"></span><span class="divider-line"></span></div>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="watermark"><svg class="icon" viewBox="0 0 24 24" width="220" height="220" stroke-width="0.6"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+    <div class="section-head">
+      <div class="section-icon"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      <span class="section-title">Projects</span>
+      <span class="section-line"></span>
+      <span class="filter-chip" id="filterChip">Filtering: <span id="filterTagText"></span> <svg class="icon" viewBox="0 0 24 24" width="12" height="12"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>
+    </div>
+
+    <div class="statchip-row">
+      <div class="statchip" data-count="2" data-suffix=""><div class="statchip-icon"><svg class="icon" viewBox="0 0 24 24" width="15" height="15"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div><div><div class="statchip-value mono"><span class="stat-num">0</span></div><div class="statchip-label">Independent projects shipped</div></div></div>
+      <div class="statchip" data-count="9" data-suffix="+"><div class="statchip-icon"><svg class="icon" viewBox="0 0 24 24" width="15" height="15"><path d="M20.59 13.41L13.42 20.58a2 2 0 0 1-2.83 0L2.83 12.83a2 2 0 0 1 0-2.83l7.17-7.17a2 2 0 0 1 2.83 0l7.76 7.76a2 2 0 0 1 0 2.83z"/></svg></div><div><div class="statchip-value mono"><span class="stat-num">0</span></div><div class="statchip-label">Technologies applied</div></div></div>
+      <div class="statchip" data-count="2" data-suffix=""><div class="statchip-icon"><svg class="icon" viewBox="0 0 24 24" width="15" height="15"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div class="statchip-value mono"><span class="stat-num">0</span></div><div class="statchip-label">Months, most recent build</div></div></div>
+    </div>
+
+    <div class="projects-grid">
+      <div class="card reveal" data-tags="AWS,Terraform,Nginx,Domain &amp; SSL">
+        <span class="corner corner-tl"></span><span class="corner corner-br"></span>
+        <div class="card-top">
+          <div class="card-icon"><svg class="icon" viewBox="0 0 24 24" width="18" height="18"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 9h20"/></svg></div>
+          <span class="card-date mono">Feb 2026</span>
+        </div>
+        <div class="card-title">Secure Website Deployment</div>
+        <p class="card-desc">Provisioned secure, scalable AWS infrastructure — EC2, VPC, IAM, S3, Security Groups, and Nginx — entirely through Terraform, with custom VPC CIDR blocks for version-controlled, repeatable deployments.</p>
+        <div class="tag-row">
+          <span class="tag" data-tag="AWS">AWS</span>
+          <span class="tag" data-tag="Terraform">Terraform</span>
+          <span class="tag" data-tag="Nginx">Nginx</span>
+          <span class="tag" data-tag="Domain & SSL">Domain &amp; SSL</span>
+        </div>
+      </div>
+
+      <div class="card reveal" data-tags="AWS,Docker,Kubernetes,HPA,Load Balancer">
+        <span class="corner corner-tl"></span><span class="corner corner-br"></span>
+        <div class="card-top">
+          <div class="card-icon"><svg class="icon" viewBox="0 0 24 24" width="18" height="18"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+          <span class="card-date mono">Dec 2025</span>
+        </div>
+        <div class="card-title">Scalable Application Deployment</div>
+        <p class="card-desc">Containerized and deployed Java applications on Amazon EKS, implementing multi-pod deployments and Horizontal Pod Autoscaling for highly available, resilient performance under dynamic traffic.</p>
+        <div class="tag-row">
+          <span class="tag" data-tag="AWS">AWS</span>
+          <span class="tag" data-tag="Docker">Docker</span>
+          <span class="tag" data-tag="Kubernetes">Kubernetes</span>
+          <span class="tag" data-tag="HPA">HPA</span>
+          <span class="tag" data-tag="Load Balancer">Load Balancer</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider" aria-hidden="true"><span class="divider-line"></span><span class="divider-node"></span><span class="divider-line"></span></div>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="watermark"><svg class="icon" viewBox="0 0 24 24" width="220" height="220" stroke-width="0.6"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><rect x="14" y="14" width="6" height="6"/></svg></div>
+    <div class="section-head">
+      <div class="section-icon"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/></svg></div>
+      <span class="section-title">Skills <span>stack</span></span>
+      <span class="section-line"></span>
+    </div>
+
+    <div class="statchip-row">
+      <div class="statchip" data-count="5" data-suffix=""><div class="statchip-icon"><svg class="icon" viewBox="0 0 24 24" width="15" height="15"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div><div><div class="statchip-value mono"><span class="stat-num">0</span></div><div class="statchip-label">Skill categories</div></div></div>
+      <div class="statchip" data-count="34" data-suffix=""><div class="statchip-icon"><svg class="icon" viewBox="0 0 24 24" width="15" height="15"><path d="M12 2l2.4 7.2H22l-6 4.4 2.3 7.1L12 16.3l-6.3 4.4L8 13.6 2 9.2h7.6z"/></svg></div><div><div class="statchip-value mono"><span class="stat-num">0</span></div><div class="statchip-label">Tools &amp; technologies</div></div></div>
+      <div class="statchip" data-static="3 Years 9 Months"><div class="statchip-icon"><svg class="icon" viewBox="0 0 24 24" width="15" height="15"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div class="statchip-value mono">3 Years 9 Months</div><div class="statchip-label">Hands-on experience</div></div></div>
+    </div>
+
+    <div class="stack reveal">
+      <div class="stack-layer">
+        <div class="stack-label"><span class="stack-icon"><svg class="icon" viewBox="0 0 24 24" width="13" height="13"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h.79a4.5 4.5 0 1 1 0 9z"/></svg></span>Cloud Platforms</div>
+        <div class="stack-items">
+          <span class="skill-pill" data-tag="AWS">AWS</span><span class="skill-pill" data-tag="EC2">EC2</span><span class="skill-pill" data-tag="S3">S3</span>
+          <span class="skill-pill" data-tag="IAM">IAM</span><span class="skill-pill" data-tag="VPC">VPC</span><span class="skill-pill" data-tag="EKS">EKS</span>
+          <span class="skill-pill" data-tag="Lambda">Lambda</span><span class="skill-pill" data-tag="CloudWatch">CloudWatch</span>
+          <span class="skill-pill" data-tag="Secrets Manager">Secrets Manager</span><span class="skill-pill" data-tag="Azure">Azure (Fundamentals)</span>
+        </div>
+      </div>
+      <div class="stack-layer">
+        <div class="stack-label"><span class="stack-icon"><svg class="icon" viewBox="0 0 24 24" width="13" height="13"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg></span>DevOps Practices</div>
+        <div class="stack-items">
+          <span class="skill-pill" data-tag="Jenkins">Jenkins</span><span class="skill-pill" data-tag="Docker">Docker</span>
+          <span class="skill-pill" data-tag="Kubernetes">Kubernetes</span><span class="skill-pill" data-tag="GitLab CI/CD">GitLab CI/CD</span>
+          <span class="skill-pill" data-tag="Terraform">Terraform</span><span class="skill-pill" data-tag="AWS CloudFormation">AWS CloudFormation</span>
+        </div>
+      </div>
+      <div class="stack-layer">
+        <div class="stack-label"><span class="stack-icon"><svg class="icon" viewBox="0 0 24 24" width="13" height="13"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>Monitoring &amp; Observability</div>
+        <div class="stack-items">
+          <span class="skill-pill" data-tag="Prometheus">Prometheus</span><span class="skill-pill" data-tag="Grafana">Grafana</span>
+          <span class="skill-pill" data-tag="CloudWatch">CloudWatch</span><span class="skill-pill" data-tag="New Relic">New Relic</span>
+        </div>
+      </div>
+      <div class="stack-layer">
+        <div class="stack-label"><span class="stack-icon"><svg class="icon" viewBox="0 0 24 24" width="13" height="13"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></span>Scripting &amp; OS</div>
+        <div class="stack-items">
+          <span class="skill-pill" data-tag="Bash">Bash / Shell</span><span class="skill-pill" data-tag="Python">Python</span>
+          <span class="skill-pill" data-tag="Linux">Linux · Ubuntu</span><span class="skill-pill" data-tag="CentOS">CentOS</span>
+          <span class="skill-pill" data-tag="RHEL">RHEL</span><span class="skill-pill" data-tag="Windows">Windows</span>
+        </div>
+      </div>
+      <div class="stack-layer">
+        <div class="stack-label"><span class="stack-icon"><svg class="icon" viewBox="0 0 24 24" width="13" height="13"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>Tools &amp; Technologies</div>
+        <div class="stack-items">
+          <span class="skill-pill" data-tag="Apache Maven">Apache Maven</span><span class="skill-pill" data-tag="Apache HTTP Server">Apache HTTP Server</span>
+          <span class="skill-pill" data-tag="Nginx">Nginx</span><span class="skill-pill" data-tag="Terraform Cloud">Terraform Cloud</span>
+          <span class="skill-pill" data-tag="GitHub">GitHub</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider" aria-hidden="true"><span class="divider-line"></span><span class="divider-node"></span><span class="divider-line"></span></div>
+
+  <!-- EDUCATION + ACHIEVEMENTS -->
+  <section id="education">
+    <div class="watermark"><svg class="icon" viewBox="0 0 24 24" width="220" height="220" stroke-width="0.6"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg></div>
+    <div class="section-head">
+      <div class="section-icon"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg></div>
+      <span class="section-title">Education <span>&amp; Achievements</span></span>
+      <span class="section-line"></span>
+    </div>
+    <div class="two-col">
+      <div class="edu-card reveal">
+        <span class="corner corner-tl"></span><span class="corner corner-br"></span>
+        <div class="edu-degree"><svg class="icon" viewBox="0 0 24 24" width="18" height="18" style="color:var(--mint)"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg>Bachelor of Technology — Computer Science &amp; Engineering</div>
+        <div class="edu-school">Amity University, Lucknow</div>
+        <div class="edu-meta">
+          <span>2018 — 2022</span>
+          <span>CGPA: 7.10 / 10.00</span>
+        </div>
+        <div class="edu-radial">
+          <div class="radial" data-percent="71">
+            <svg viewBox="0 0 72 72" class="radial-svg">
+              <circle cx="36" cy="36" r="30" fill="none" stroke="var(--line)" stroke-width="6"/>
+              <circle class="radial-fill" cx="36" cy="36" r="30" fill="none" stroke="var(--mint)" stroke-width="6"
+                stroke-dasharray="188.5" stroke-dashoffset="188.5" stroke-linecap="round" transform="rotate(-90 36 36)"/>
+            </svg>
+            <div class="radial-value mono"><span class="radial-num">0</span>%</div>
+            <div class="radial-text">
+              <div class="radial-label">CGPA score</div>
+              <div class="radial-sublabel">7.10 / 10.00 at Amity University</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="badge-list">
+        <div class="badge reveal">
+          <div class="badge-icon"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="8" r="6"/><path d="M9 14l-2 8 5-3 5 3-2-8"/></svg></div>
+          <div>
+            <div class="badge-title">Coforge Appreciation Award — 2026</div>
+            <div class="badge-desc">Recognized for exceptional performance and outstanding achievements.</div>
+          </div>
+        </div>
+        <div class="badge reveal">
+          <div class="badge-icon"><svg class="icon" viewBox="0 0 24 24" width="16" height="16"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <div>
+            <div class="badge-title">Coforge Collaboration Award — 2025</div>
+            <div class="badge-desc">Recognized for exceptional client delivery and team performance.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer id="contact" class="footer">
+  <div class="wrap">
+    <div class="contact-inner">
+      <div>
+        <div class="contact-title">Let's ship something <span>reliable.</span></div>
+        <p class="contact-sub">Open to DevOps, Cloud, and SRE roles where automation and uptime actually matter.</p>
+      </div>
+      <div class="contact-links">
+        <button id="copyEmail"><svg class="icon" viewBox="0 0 24 24" width="14" height="14"><path d="M22 6l-10 7L2 6"/><path d="M2 6h20v12H2z"/></svg><span>pushpendratripathi303@gmail.com</span><span class="copy-icon"><svg class="icon" viewBox="0 0 24 24" width="13" height="13"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></span></button>
+        <button id="copyPhone"><svg class="icon" viewBox="0 0 24 24" width="14" height="14"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>+91 9935789907</span><span class="copy-icon"><svg class="icon" viewBox="0 0 24 24" width="13" height="13"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></span></button>
+        <a href="https://linkedin.com/in/pushpendra-tripathi-248b4b179" target="_blank" rel="noopener"><svg class="icon" viewBox="0 0 24 24" width="14" height="14"><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/><path d="M10 9h4v2s1-2 4-2c3 0 4 2 4 5v7h-4v-6c0-2-1-3-2-3s-2 1-2 3v6h-4z"/></svg>linkedin.com/in/pushpendra-tripathi<svg class="icon" viewBox="0 0 24 24" width="12" height="12"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></a>
+        <a href="https://github.com/Pushpendra-99" target="_blank" rel="noopener"><svg class="icon" viewBox="0 0 24 24" width="14" height="14"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-1-2.6c3 0 6-2 6-5.5.1-1.3-.4-2.6-1.2-3.6.2-1 .2-2.1-.2-3.1 0 0-1 0-3 1.2a10.6 10.6 0 0 0-5.6 0C8 3.7 7 3.7 7 3.7c-.4 1-.4 2.1-.2 3.1A5.5 5.5 0 0 0 5.6 10.4c0 3.5 3 5.4 6 5.5a3.4 3.4 0 0 0-.9 2.5V22"/></svg>github.com/Pushpendra-99<svg class="icon" viewBox="0 0 24 24" width="12" height="12"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></a>
+      </div>
+    </div>
+    <div class="foot-bar">
+      <span id="year"></span>
+      <span>Built with Terraform-grade attention to detail.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  document.getElementById('year').textContent = '© ' + new Date().getFullYear() + ' Pushpendra Tripathi';
+
+  var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------------- Network background canvas ---------------- */
+  (function networkBackground(){
+    var canvas = document.getElementById('network-canvas');
+    var ctx = canvas.getContext('2d');
+    var nodes = [], w = 0, h = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var mouse = { x: -9999, y: -9999 };
+
+    function resize(){
+      w = window.innerWidth; h = window.innerHeight;
+      canvas.width = w * dpr; canvas.height = h * dpr;
+      canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var count = Math.max(24, Math.min(70, Math.floor((w * h) / 24000)));
+      nodes = [];
+      for (var i = 0; i < count; i++){
+        nodes.push({
+          x: Math.random() * w, y: Math.random() * h,
+          vx: (Math.random() - 0.5) * 0.25, vy: (Math.random() - 0.5) * 0.25,
+          r: Math.random() * 1.6 + 0.6
+        });
+      }
+    }
+
+    function step(){
+      ctx.clearRect(0, 0, w, h);
+      for (var i = 0; i < nodes.length; i++){
+        var n = nodes[i];
+        if (!prefersReduced){
+          n.x += n.vx; n.y += n.vy;
+          if (n.x < 0 || n.x > w) n.vx *= -1;
+          if (n.y < 0 || n.y > h) n.vy *= -1;
+        }
+      }
+      for (var a = 0; a < nodes.length; a++){
+        for (var b = a + 1; b < nodes.length; b++){
+          var dx = nodes[a].x - nodes[b].x, dy = nodes[a].y - nodes[b].y;
+          var dist = Math.sqrt(dx*dx + dy*dy);
+          if (dist < 130){
+            ctx.strokeStyle = 'rgba(94,234,212,' + (0.09 * (1 - dist/130)) + ')';
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(nodes[a].x, nodes[a].y); ctx.lineTo(nodes[b].x, nodes[b].y); ctx.stroke();
+          }
+        }
+        var dxm = nodes[a].x - mouse.x, dym = nodes[a].y - mouse.y;
+        var distm = Math.sqrt(dxm*dxm + dym*dym);
+        if (distm < 160){
+          ctx.strokeStyle = 'rgba(245,166,35,' + (0.35 * (1 - distm/160)) + ')';
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(nodes[a].x, nodes[a].y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
+        }
+      }
+      for (var k = 0; k < nodes.length; k++){
+        ctx.beginPath(); ctx.arc(nodes[k].x, nodes[k].y, nodes[k].r, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(144,160,190,0.55)'; ctx.fill();
+      }
+      requestAnimationFrame(step);
+    }
+
+    window.addEventListener('resize', resize);
+    window.addEventListener('mousemove', function(e){ mouse.x = e.clientX; mouse.y = e.clientY; });
+    window.addEventListener('mouseleave', function(){ mouse.x = -9999; mouse.y = -9999; });
+    resize();
+    requestAnimationFrame(step);
+  })();
+
+  /* ---------------- Typewriter terminal ---------------- */
+  (function typewriter(){
+    var commands = [
+      'terraform apply -auto-approve',
+      'kubectl get pods -n production',
+      'docker build -t app:latest .',
+      'aws eks update-kubeconfig --name prod-cluster',
+      'helm upgrade --install app ./chart'
+    ];
+    var el = document.getElementById('typed');
+    var cmdIndex = 0, charIndex = 0, deleting = false;
+    var typeSpeed = 55, pause = 1400;
+
+    function tick(){
+      var current = commands[cmdIndex % commands.length];
+      if (!deleting && charIndex < current.length){
+        charIndex++; el.textContent = current.slice(0, charIndex);
+        setTimeout(tick, typeSpeed);
+      } else if (!deleting && charIndex === current.length){
+        deleting = true; setTimeout(tick, pause);
+      } else if (deleting && charIndex > 0){
+        charIndex--; el.textContent = current.slice(0, charIndex);
+        setTimeout(tick, typeSpeed / 2);
+      } else {
+        deleting = false; cmdIndex++;
+        setTimeout(tick, typeSpeed);
+      }
+    }
+    tick();
+  })();
+
+  /* ---------------- Pipeline stage animation ---------------- */
+  (function pipeline(){
+    var stages = document.querySelectorAll('.stage');
+    var progress = document.getElementById('pipeProgress');
+    var current = 0;
+    function update(){
+      stages.forEach(function(s, i){
+        s.classList.remove('active', 'done');
+        if (i === current) s.classList.add('active');
+        else if (i < current) s.classList.add('done');
+      });
+      progress.style.width = (current / (stages.length - 1)) * 100 + '%';
+      current = (current + 1) % stages.length;
+    }
+    update();
+    setInterval(update, 1600);
+  })();
+
+  /* ---------------- Nav: scroll spy + mobile menu ---------------- */
+  (function nav(){
+    var navButtons = document.querySelectorAll('.navlinks button, .mobile-menu button');
+    var sections = ['summary', 'experience', 'projects', 'skills', 'contact']
+      .map(function(id){ return document.getElementById(id); })
+      .filter(Boolean);
+
+    navButtons.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var target = document.getElementById(btn.dataset.target);
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('mobileMenu').classList.remove('open');
+      });
+    });
+
+    var menuBtn = document.getElementById('menuBtn');
+    menuBtn.addEventListener('click', function(){
+      document.getElementById('mobileMenu').classList.toggle('open');
+    });
+
+    var observer = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting){
+          navButtons.forEach(function(b){
+            b.classList.toggle('active', b.dataset.target === entry.target.id);
+          });
+        }
+      });
+    }, { rootMargin: '-40% 0px -50% 0px', threshold: 0 });
+    sections.forEach(function(s){ observer.observe(s); });
+  })();
+
+  /* ---------------- Scroll reveal ---------------- */
+  (function reveal(){
+    var els = document.querySelectorAll('.reveal');
+    var observer = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting){
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    els.forEach(function(el){ observer.observe(el); });
+  })();
+
+  /* ---------------- Radial stat rings (count up on view) ---------------- */
+  (function radials(){
+    var radials = document.querySelectorAll('.radial');
+    var observer = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting){
+          var el = entry.target;
+          var percent = parseInt(el.dataset.percent, 10);
+          var numEl = el.querySelector('.radial-num');
+          var fillEl = el.querySelector('.radial-fill');
+          var c = 188.5;
+          var offset = c - (percent / 100) * c;
+          fillEl.style.strokeDashoffset = offset;
+          var start = performance.now(), duration = 1400;
+          function tick(now){
+            var p = Math.min(1, (now - start) / duration);
+            var eased = 1 - Math.pow(1 - p, 3);
+            numEl.textContent = Math.round(percent * eased);
+            if (p < 1) requestAnimationFrame(tick);
+          }
+          requestAnimationFrame(tick);
+          observer.unobserve(el);
+        }
+      });
+    }, { threshold: 0.4 });
+    radials.forEach(function(el){ observer.observe(el); });
+  })();
+
+  /* ---------------- Stat chips (count up on view) ---------------- */
+  (function statChips(){
+    var chips = document.querySelectorAll('.statchip[data-count]');
+    var observer = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting){
+          var el = entry.target;
+          var value = parseInt(el.dataset.count, 10);
+          var suffix = el.dataset.suffix || '';
+          var numEl = el.querySelector('.stat-num');
+          var start = performance.now(), duration = 900;
+          function tick(now){
+            var p = Math.min(1, (now - start) / duration);
+            var eased = 1 - Math.pow(1 - p, 3);
+            numEl.textContent = Math.round(value * eased) + (p >= 1 ? suffix : '');
+            if (p < 1) requestAnimationFrame(tick);
+          }
+          requestAnimationFrame(tick);
+          observer.unobserve(el);
+        }
+      });
+    }, { threshold: 0.4 });
+    chips.forEach(function(el){ observer.observe(el); });
+  })();
+
+  /* ---------------- Hero spotlight ---------------- */
+  (function spotlight(){
+    var hero = document.getElementById('heroSection');
+    var sp = document.getElementById('spotlight');
+    hero.addEventListener('mousemove', function(e){
+      var rect = hero.getBoundingClientRect();
+      var x = ((e.clientX - rect.left) / rect.width) * 100;
+      var y = ((e.clientY - rect.top) / rect.height) * 100;
+      sp.style.setProperty('--sx', x + '%');
+      sp.style.setProperty('--sy', y + '%');
+      sp.classList.add('on');
+    });
+    hero.addEventListener('mouseleave', function(){ sp.classList.remove('on'); });
+  })();
+
+  /* ---------------- Project card tilt ---------------- */
+  (function tilt(){
+    document.querySelectorAll('.card').forEach(function(card){
+      card.addEventListener('mousemove', function(e){
+        var rect = card.getBoundingClientRect();
+        var px = (e.clientX - rect.left) / rect.width - 0.5;
+        var py = (e.clientY - rect.top) / rect.height - 0.5;
+        card.style.transform = 'perspective(700px) rotateX(' + (py * -6) + 'deg) rotateY(' + (px * 6) + 'deg) translateY(-3px)';
+      });
+      card.addEventListener('mouseleave', function(){ card.style.transform = ''; });
+    });
+  })();
+
+  /* ---------------- Tag filtering (project tags + skill pills) ---------------- */
+  (function tagFilter(){
+    var activeTag = null;
+    var filterChip = document.getElementById('filterChip');
+    var filterTagText = document.getElementById('filterTagText');
+    var cards = document.querySelectorAll('.card');
+    var allTagEls = document.querySelectorAll('.tag, .skill-pill');
+
+    function apply(){
+      if (activeTag){
+        filterChip.classList.add('show');
+        filterTagText.textContent = activeTag;
+      } else {
+        filterChip.classList.remove('show');
+      }
+      cards.forEach(function(card){
+        var tags = (card.dataset.tags || '').split(',');
+        var matched = activeTag && tags.some(function(t){ return t.toLowerCase().indexOf(activeTag.toLowerCase()) !== -1; });
+        card.classList.toggle('match', !!matched);
+        card.classList.toggle('dim', !!(activeTag && !matched));
+      });
+      allTagEls.forEach(function(el){
+        el.classList.toggle('active', activeTag && el.dataset.tag === activeTag);
+      });
+    }
+
+    allTagEls.forEach(function(el){
+      el.addEventListener('click', function(){
+        var tag = el.dataset.tag;
+        activeTag = (activeTag === tag) ? null : tag;
+        apply();
+      });
+    });
+    filterChip.addEventListener('click', function(){ activeTag = null; apply(); });
+  })();
+
+  /* ---------------- Copy to clipboard ---------------- */
+  (function copyButtons(){
+    function setup(id, value){
+      var btn = document.getElementById(id);
+      var icon = btn.querySelector('.copy-icon');
+      btn.addEventListener('click', function(){
+        if (navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(value).then(function(){
+            btn.classList.add('copied');
+            icon.innerHTML = '<svg class="icon" viewBox="0 0 24 24" width="13" height="13"><polyline points="20 6 9 17 4 12"/></svg>';
+            setTimeout(function(){
+              btn.classList.remove('copied');
+              icon.innerHTML = '<svg class="icon" viewBox="0 0 24 24" width="13" height="13"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+            }, 1800);
+          });
+        }
+      });
+    }
+    setup('copyEmail', 'pushpendratripathi303@gmail.com');
+    setup('copyPhone', '+91 9935789907');
+  })();
+
+})();
+</script>
+
+</body>
+</html>
